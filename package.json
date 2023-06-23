@@ -1,5 +1,5 @@
 {
-  "name": "express-template-fs",
+  "name": "express-template-fs23",
   "version": "1.0.0",
   "description": "In this package, you will be able to set up your express app automatically which saves time for you to do your project so you don't have to worry about going through the same process of installing packages, creating folders for middleware, API, and models, creating the `database.js` file, and creating a `.env` file.",
   "main": "app.js",
