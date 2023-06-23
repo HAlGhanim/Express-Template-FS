@@ -5,7 +5,7 @@ const morgan = require("morgan");
 const app = express();
 const notFound = require("./middlewares/notFoundHandler");
 const errorHandler = require("./middlewares/errorHandler");
-const tempRoutes = require("./api/temp.routes");
+const tempRoutes = require("./api/temp/temp.routes");
 require("dotenv").config();
 
 app.use(cors());
@@ -22,3 +22,5 @@ app.use(errorHandler);
 app.listen(process.env.PORT, () => {
   console.log(`The application is running on ${process.env.PORT}`);
 });
+
+module.exports = app;

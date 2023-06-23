@@ -4,7 +4,7 @@ const Temp = require("../../models/Temp");
 
 exports.fetchTemp = async (tempId, next) => {
   try {
-    const temp1 = await Temp.findById(tempId).select("-__v");
+    const temp1 = await Temp.findById(tempId);
     return temp1;
   } catch (error) {
     return next(error);
@@ -22,7 +22,7 @@ exports.getTemp = async (req, res, next) => {
 
 exports.createTemp = async (req, res, next) => {
   try {
-    const newTemp = await Temp.create(req.body).select("-__v");
+    const newTemp = await Temp.create(req.body);
     return res.status(201).json(newTemp);
   } catch (error) {
     return next(error);
@@ -31,7 +31,7 @@ exports.createTemp = async (req, res, next) => {
 
 exports.updateTemp = async (req, res, next) => {
   try {
-    await Temp.findByIdAndUpdate(req.temp.id, req.body).select("-__v");
+    await Temp.findByIdAndUpdate(req.temp.id, req.body);
     return res.status(204).end();
   } catch (error) {
     return next(error);
@@ -40,7 +40,7 @@ exports.updateTemp = async (req, res, next) => {
 
 exports.deleteTemp = async (req, res, next) => {
   try {
-    await Temp.findByIdAndRemove({ _id: req.temp.id }).select("-__v");
+    await Temp.findByIdAndRemove({ _id: req.temp.id });
     return res.status(204).end();
   } catch (error) {
     return next(error);

@@ -4,6 +4,7 @@ const {
   createTemp,
   updateTemp,
   deleteTemp,
+  fetchTemp,
 } = require("./temp.controllers");
 const router = express.Router();
 
