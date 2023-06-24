@@ -30,6 +30,34 @@ module.exports = (req, res, next) => {
 };
 
 ```
+
+* `passport.js`
+
+```javascript
+const LocalStrategy = require("passport-local");
+const Temp = require("../models/Temp");
+const bcrypt = require("bcrypt");
+
+exports.localStrategy = new LocalStrategy(
+  { usernameField: "name" },
+  async (name, password, done) => {
+    try {
+      const temp = await Temp.findOne({ name: name});
+      if (!temp) {
+        return done(null, false);
+      }
+      const passwordMatch = await bcrypt.compare(password, temp.password);
+      if (!passwordMatch) {
+        return done(null, false);
+      }
+      return done(null, temp);
+    } catch (error) {
+      return done(error);
+    }
+  }
+);
+
+```
 ## database.js
 ```javascript
 const mongoose = require("mongoose");
@@ -48,9 +76,11 @@ module.exports = connectDB;
 
 ```javascript
 const { model, Schema } = require("mongoose");
+// Everything with the word temp is a placeholder that you'll change in accordance with your project
 
 const TempSchema = new Schema({
-  // your schema keys here along with their associated values
+  name: { type: String, unique: true, required: true },
+  password: { type: String, required: true },
 });
 
 module.exports = model("Temp", TempSchema);
@@ -59,89 +89,130 @@ module.exports = model("Temp", TempSchema);
 ## api/temp folders
 * `temp.controllers.js`
   
-  ```javascript
-  const Temp = require("../../models/Temp");
+```javascript
+const Temp = require("../../models/Temp");
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+require("dotenv").config();
+// Everything with the word temp is a placeholder that you'll change in accordance with your project
 
-  // Everything with the word temp is a placeholder that you'll change in accordance with your project
-  
-  exports.fetchTemp = async (tempId, next) => {
-    try {
-      const temp1 = await Temp.findById(tempId).select("-__v");
-      return temp1;
-    } catch (error) {
-      return next(error);
-    }
+const passHash = async (password) => {
+  const rounds = 10;
+  const hashedPassword = await bcrypt.hash(password, rounds);
+  return hashedPassword;
+};
+
+const generateToken = (temp) => {
+  const payload = {
+    _id: temp._id,
+    name: temp.name,
   };
-  
-  exports.getTemp = async (req, res, next) => {
-    try {
-      const temps = await Temp.find().select("-__v");
-      return res.status(200).json(temps);
-    } catch (error) {
-      return next(error);
-    }
-  };
-  
-  exports.createTemp = async (req, res, next) => {
-    try {
-      const newTemp = await Temp.create(req.body).select("-__v");
-      return res.status(201).json(newTemp);
-    } catch (error) {
-      return next(error);
-    }
-  };
-  
-  exports.updateTemp = async (req, res, next) => {
-    try {
-      await Temp.findByIdAndUpdate(req.temp.id, req.body).select("-__v");
-      return res.status(204).end();
-    } catch (error) {
-      return next(error);
-    }
-  };
-  
-  exports.deleteTemp = async (req, res, next) => {
-    try {
-      await Temp.findByIdAndRemove({ _id: req.temp.id }).select("-__v");
-      return res.status(204).end();
-    } catch (error) {
-      return next(error);
-    }
-  };
-  ```
+  const token = jwt.sign(payload, process.env.JWT_SECRET, {
+    expiresIn: process.env.JWT_TOKEN_EXP,
+  });
+  return token;
+};
+
+exports.signin = async (req, res) => {
+  try {
+    console.log(req.user);
+    const token = generateToken(req.user);
+    return res.status(200).json({ token });
+  } catch (err) {
+    res.status(500).json(err.message);
+  }
+};
+
+exports.signup = async (req, res) => {
+  try {
+    const { password } = req.body;
+    req.body.password = await passHash(password);
+    const newTemp = await Temp.create(req.body);
+    const token = generateToken(newTemp);
+    res.status(201).json({ token });
+  } catch (err) {
+    res.status(500).json(err.message);
+  }
+};
+
+exports.fetchTemp = async (tempId, next) => {
+  try {
+    const temp1 = await Temp.findById(tempId);
+    return temp1;
+  } catch (error) {
+    return next(error);
+  }
+};
+
+exports.getTemp = async (req, res, next) => {
+  try {
+    const temps = await Temp.find().select("-__v");
+    return res.status(200).json(temps);
+  } catch (error) {
+    return next(error);
+  }
+};
+
+exports.updateTemp = async (req, res, next) => {
+  try {
+    await Temp.findByIdAndUpdate(req.temp.id, req.body);
+    return res.status(204).end();
+  } catch (error) {
+    return next(error);
+  }
+};
+
+exports.deleteTemp = async (req, res, next) => {
+  try {
+    await Temp.findByIdAndRemove({ _id: req.temp.id });
+    return res.status(204).end();
+  } catch (error) {
+    return next(error);
+  }
+};
+
+```
   
 * `temp.routes.js`
-  
-  ```javascript
+```javascript
   const express = require("express");
-  const {
-    getTemp,
-    createTemp,
-    updateTemp,
-    deleteTemp,
-  } = require("./temp.controllers");
-  const router = express.Router();
-  
-  // Everything with the word temp is a placeholder that you'll change in accordance with your project
-  
-  router.param("tempId", async (req, res, next, tempId) => {
-    try {
-      const foundTemp = await fetchTemp(tempId);
-      if (!foundTemp) return next({ status: 404, message: "Temp not found" });
-      req.temp = foundTemp;
-      next();
-    } catch (error) {
-      return next(error);
-    }
-  });
-  
-  router.get("/", getTemp);
-  router.post("/", createTemp);
-  router.put("/:tempId", updateTemp);
-  router.delete("/:tempId", deleteTemp);
-  
-  module.exports = router;
-  ```
+const {
+  getTemp,
+  updateTemp,
+  deleteTemp,
+  fetchTemp,
+  signin,
+  signup,
+} = require("./temp.controllers");
+const router = express.Router();
+const passport = require("passport");
+
+// Everything with the word temp is a placeholder that you'll change in accordance with your project
+
+router.param("tempId", async (req, res, next, tempId) => {
+  try {
+    const foundTemp = await fetchTemp(tempId);
+    if (!foundTemp) return next({ status: 404, message: "Temp not found" });
+    req.temp = foundTemp;
+    next();
+  } catch (error) {
+    return next(error);
+  }
+});
+
+router.get("/", getTemp);
+router.post("/signup", signup);
+router.put("/:tempId", updateTemp);
+router.delete("/:tempId", deleteTemp);
+
+router.post(
+  "/signin",
+  passport.authenticate("local", { session: false }),
+  signin
+);
+
+module.exports = router;
+```
 
 ## app.js 
 ```javascript
@@ -152,13 +223,18 @@ const morgan = require("morgan");
 const app = express();
 const notFound = require("./middlewares/notFoundHandler");
 const errorHandler = require("./middlewares/errorHandler");
-const tempRoutes = require("./api/temp.routes");
+const tempRoutes = require("./api/temp/temp.routes");
+const passport = require("passport");
+const { localStrategy } = require("./middlewares/passport");
 require("dotenv").config();
 
 app.use(cors());
 connectDb();
 app.use(express.json());
 app.use(morgan("dev"));
+
+app.use(passport.initialize());
+passport.use("local", localStrategy);
 
 // Everything with the word temp is a placeholder that you'll change in accordance with your project
 app.use("/temp", tempRoutes);
@@ -209,6 +285,8 @@ app.listen(process.env.PORT, () => {
 ## .env 
 ```javascript
 PORT = 8000
+JWT_SECRET = "secret"
+JWT_TOKEN_EXP = "1h"
 MONGO_DB_URL = "YOUR MONGODB URL"
 ```
 
