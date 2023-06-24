@@ -2,6 +2,8 @@
 
 In this package, you will be able to set up your express app automatically which saves time for you to do your project so you don't have to worry about going through the same process of installing packages, creating folders for middleware, API, and models, creating the `database.js` file, and creating a `.env` file.
 
+Template 2.0: made the template tailored to authorization and authentication
+
 You will have to use `npm install` to install node modules.
 Anything with the word `temp` is meant to be changed in accordance with your project.
 
