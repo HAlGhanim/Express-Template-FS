@@ -253,10 +253,14 @@ app.listen(process.env.PORT, () => {
 * `dotenv`
 * `morgan`
 * `cors`
+* `bcrypt`
+* `jsonwebtoken`
+* `passport`
+* `passport-local`
  
 ```json
 {
-  "name": "express-template-package",
+  "name": "express-template-fs23",
   "version": "1.0.0",
   "description": "In this package, you will be able to set up your express app automatically which saves time for you to do your project so you don't have to worry about going through the same process of installing packages, creating folders for middleware, API, and models, creating the `database.js` file, and creating a `.env` file.",
   "main": "app.js",
@@ -266,14 +270,18 @@ app.listen(process.env.PORT, () => {
     "devStart": "nodemon app.js"
   },
   "keywords": [],
-  "author": "",
+  "author": "HAlGhanim",
   "license": "ISC",
   "dependencies": {
+    "bcrypt": "^5.1.0",
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",
     "express": "^4.18.2",
+    "jsonwebtoken": "^9.0.0",
     "mongoose": "^7.3.1",
-    "morgan": "^1.10.0"
+    "morgan": "^1.10.0",
+    "passport": "^0.6.0",
+    "passport-local": "^1.0.0"
   },
   "devDependencies": {
     "nodemon": "^2.0.22"
