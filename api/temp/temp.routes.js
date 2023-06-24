@@ -1,12 +1,14 @@
 const express = require("express");
 const {
   getTemp,
-  createTemp,
   updateTemp,
   deleteTemp,
   fetchTemp,
+  signin,
+  signup,
 } = require("./temp.controllers");
 const router = express.Router();
+const passport = require("passport");
 
 // Everything with the word temp is a placeholder that you'll change in accordance with your project
 
@@ -22,8 +24,14 @@ router.param("tempId", async (req, res, next, tempId) => {
 });
 
 router.get("/", getTemp);
-router.post("/", createTemp);
+router.post("/signup", signup);
 router.put("/:tempId", updateTemp);
 router.delete("/:tempId", deleteTemp);
+
+router.post(
+  "/signin",
+  passport.authenticate("local", { session: false }),
+  signin
+);
 
 module.exports = router;
