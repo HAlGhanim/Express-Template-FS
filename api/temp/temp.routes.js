@@ -1,11 +1,11 @@
 const express = require("express");
 const {
   getTemp,
+  createTemp,
   updateTemp,
   deleteTemp,
   fetchTemp,
   signin,
-  signup,
 } = require("./temp.controllers");
 const router = express.Router();
 const passport = require("passport");
@@ -23,15 +23,14 @@ router.param("tempId", async (req, res, next, tempId) => {
   }
 });
 
-router.get("/", getTemp);
-router.post("/signup", signup);
-router.put("/:tempId", updateTemp);
-router.delete("/:tempId", deleteTemp);
-
+router.get("/", passport.authenticate("jwt", { session: false }), getTemp);
+router.post("/createTemp", createTemp);
 router.post(
   "/signin",
   passport.authenticate("local", { session: false }),
   signin
 );
+router.put("/:tempId", updateTemp);
+router.delete("/:tempId", deleteTemp);
 
 module.exports = router;
