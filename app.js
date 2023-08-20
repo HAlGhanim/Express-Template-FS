@@ -3,9 +3,9 @@ const connectDb = require("./database");
 const cors = require("cors");
 const morgan = require("morgan");
 const app = express();
-const notFound = require("./middlewares/notFoundHandler");
-const errorHandler = require("./middlewares/errorHandler");
-const tempRoutes = require("./api/temp/temp.routes");
+const notFound = require("./middlewares/errors/notFoundHandler");
+const errorHandler = require("./middlewares/errors/errorHandler");
+const userRoutes = require("./api/Auth/routes");
 const config = require("./config/keys");
 const passport = require("passport");
 const { localStrategy, jwtStrategy } = require("./middlewares/passport");
@@ -19,8 +19,9 @@ app.use(passport.initialize());
 passport.use("local", localStrategy);
 passport.use(jwtStrategy);
 
-// Everything with the word temp is a placeholder that you'll change in accordance with your project
-app.use("/temp", tempRoutes);
+app.use("/media", express.static(path.join(__dirname, "media")));
+
+app.use("/temp", userRoutes);
 
 app.use(notFound);
 app.use(errorHandler);
