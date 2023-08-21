@@ -1,4 +1,4 @@
-const passhash = require("./passhash");
+const passhash = require("../../utils/auth/passhash");
 
 exports.hashing = async (req, res, next) => {
   if (req.body.password) {
