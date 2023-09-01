@@ -39,7 +39,7 @@ exports.jwtStrategy = new JWTStrategy(
       return done(null, false);
     }
     try {
-      const user = await Temp.findById(jwtPayload._id);
+      const user = await User.findById(jwtPayload._id);
       return done(null, user);
     } catch (error) {
       return done(error);

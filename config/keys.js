@@ -7,8 +7,9 @@ const config = {
   MONGO_DB_URL: process.env.MONGO_DB_URL,
 };
 
-if (!config.JWT_TOKEN_EXP) {
-  console.log("missing env values!");
-  process.exit(1);
+for (const key in config) {
+  if (!config[key]) {
+    throw new Error(`Environment variable ${key} is missing`);
+  }
 }
 module.exports = config;
