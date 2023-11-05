@@ -49,7 +49,7 @@ exports.updateUser = async (req, res, next) => {
 
 exports.deleteUser = async (req, res, next) => {
   try {
-    await User.findByIdAndRemove({ _id: req.user.id });
+    await req.user.deleteOne();
     return res.status(204).end();
   } catch (error) {
     return next(error);
