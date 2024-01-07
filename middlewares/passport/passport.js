@@ -13,7 +13,10 @@ exports.localStrategy = new LocalStrategy(
   async (username, password, done) => {
     try {
       const user = await User.findOne({
-        $or: [{ username: username }, { email: username }],
+        $or: [
+          { username: username.toLowerCase().trim() },
+          { email: username.toLowerCase().trim() },
+        ],
       });
       if (!user) {
         return done({ message: "Invalid credentials" }, false);

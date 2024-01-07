@@ -1,12 +1,5 @@
 const express = require("express");
-const {
-  getUsers,
-  signup,
-  signin,
-  updateUser,
-  deleteUser,
-  fetchUser,
-} = require("./controllers");
+const Auth = require("./controllers");
 const {
   imageConditional,
 } = require("../../middlewares/Images/imageConditional");
@@ -14,6 +7,7 @@ const { hashing } = require("../../middlewares/password/password");
 const router = express.Router();
 const passport = require("passport");
 const upload = require("../../middlewares/Images/uploader");
+const rateLimiter = require("../../middlewares/rates/rateLimiter");
 
 router.param("userId", async (req, res, next, userId) => {
   try {
@@ -32,23 +26,24 @@ router.post(
   upload.single("image"),
   imageConditional,
   hashing,
-  signup
+  Auth.signup
 );
 router.post(
   "/signin",
+  rateLimiter({ limit: 7, windowMs: 2 * 60 * 1000 }),
   passport.authenticate("local", { session: false }),
-  signin
+  Auth.signin
 );
 router.put(
   "/:userId",
   passport.authenticate("jwt", { session: false }),
   hashing,
-  updateUser
+  Auth.updateUser
 );
 router.delete(
   "/:userId",
   passport.authenticate("jwt", { session: false }),
-  deleteUser
+  Auth.deleteUser
 );
 
 module.exports = router;
