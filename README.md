@@ -9,7 +9,7 @@ You will have to use `npm install` to install node modules.
 
 ## File Structure
 
-![Alt text](https://ibb.co/Jqvg6Q1)
+![Alt text](express-template-structure.png)
 
 ### .env
 
