@@ -1,7 +1,7 @@
 {
   "name": "express-template-fs23",
   "version": "1.0.0",
-  "description": "In this package, you will be able to set up your express app automatically which saves time for you to do your project so you don't have to worry about going through the same process of installing packages, creating folders for middleware, API, and models, creating the `database.js` file, and creating a `.env` file.",
+  "description": "In this template, you have all the necessary apis, models, middlewares, and files for a functional user authentication server.",
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",

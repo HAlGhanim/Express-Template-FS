@@ -12,7 +12,7 @@ exports.fetchUser = async (userId, next) => {
 
 exports.getUsers = async (req, res, next) => {
   try {
-    const users = await User.find().select("-__v");
+    const users = await User.find();
     return res.status(200).json(users);
   } catch (error) {
     return next(error);
