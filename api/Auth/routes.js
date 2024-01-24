@@ -20,7 +20,7 @@ router.param("userId", async (req, res, next, userId) => {
   }
 });
 
-router.get("/", getUsers);
+router.get("/", Auth.getUsers);
 router.post(
   "/signup",
   upload.single("image"),
