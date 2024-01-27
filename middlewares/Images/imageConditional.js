@@ -3,6 +3,6 @@ exports.imageConditional = (req, res, next) => {
     req.body.image = `media/${req.file.filename}`;
     next();
   } else {
-    res.status(400).json({ error: "No image uploaded" });
+    return res.status(400).json({ error: "No image uploaded" });
   }
 };
